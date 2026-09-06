@@ -3,7 +3,7 @@
 **Architecture & Deployment Requirements**
 
 Owner: Platform Engineering
-Last updated: 2026-03-20
+Last updated: 2026-09-06
 
 ## Overview
 
@@ -27,7 +27,7 @@ Failed events (after 3 retries) go to a DLQ for ops review.
 ## Components
 
 - **Lambda** — Python 3.12, runs in private VPC subnets, consumes SQS in batches with partial failure support. X-Ray tracing on.
-- **SQS** — Main queue feeds Lambda. DLQ retains bad messages for 7 days for ops review. Both CMK-encrypted.
+- **SQS** — Main queue feeds Lambda. DLQ retains bad messages for 14 days for ops review, per Ops' request for a longer investigation window on failed ward-event batches. Both CMK-encrypted.
 - **DynamoDB** — Real-time bed state. PAY_PER_REQUEST, CMK encrypted, PITR enabled. GSI on `ward_id` for per-ward queries. 90-day TTL; long-term data lives in S3.
 - **SNS** — Alerts care coordinators when a bed flips to available in a flagged unit. CMK encrypted, email subscription.
 - **S3** — HIPAA audit archive. Versioned, CMK encrypted, no public access. Lifecycle transitions to Glacier at 1 year, expires at 6 years (HIPAA minimum).
